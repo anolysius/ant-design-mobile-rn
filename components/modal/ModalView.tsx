@@ -1,6 +1,7 @@
 import React from 'react';
 import {
   Animated,
+  BackHandler,
   Dimensions,
   Easing,
   StyleProp,
@@ -8,10 +9,9 @@ import {
   TouchableWithoutFeedback,
   View,
   ViewStyle,
-  BackHandler,
 } from 'react-native';
 import Portal from '../portal';
-import { CallbackOnBackHandler } from "./PropsType";
+import { CallbackOnBackHandler } from './PropsType';
 
 const styles = StyleSheet.create({
   wrap: {
@@ -45,7 +45,7 @@ export interface IModalPropTypes {
   visible: boolean;
   maskClosable?: boolean;
   animateAppear?: boolean;
-  onClose?: () => void;                        // onDismiss
+  onClose?: () => void; // onDismiss
   onAnimationEnd?: (visible: boolean) => void; // onShow
   onRequestClose?: CallbackOnBackHandler;
 }
@@ -177,7 +177,10 @@ export default class RCModal extends React.Component<IModalPropTypes, any> {
           this.setState({
             modalVisible: false,
           });
-          BackHandler.removeEventListener('hardwareBackPress', this.onBackAndroid);
+          BackHandler.removeEventListener(
+            'hardwareBackPress',
+            this.onBackAndroid,
+          );
         }
         if (this.props.onAnimationEnd) {
           this.props.onAnimationEnd(visible);
@@ -188,7 +191,10 @@ export default class RCModal extends React.Component<IModalPropTypes, any> {
         this.setState({
           modalVisible: false,
         });
-        BackHandler.removeEventListener('hardwareBackPress', this.onBackAndroid);
+        BackHandler.removeEventListener(
+          'hardwareBackPress',
+          this.onBackAndroid,
+        );
       }
     }
   };
@@ -217,8 +223,10 @@ export default class RCModal extends React.Component<IModalPropTypes, any> {
   };
   render() {
     const { props } = this;
+    const wrapDisplay: { display?: any } = {};
     if (!this.state.modalVisible) {
-      return null as any;
+      //return null as any;
+      wrapDisplay.display = 'none';
     }
     const animationStyleMap = {
       none: {},
@@ -232,7 +240,7 @@ export default class RCModal extends React.Component<IModalPropTypes, any> {
 
     return (
       <Portal>
-        <View style={[styles.wrap, props.wrapStyle]}>
+        <View style={[styles.wrap, props.wrapStyle, wrapDisplay]}>
           <TouchableWithoutFeedback onPress={this.onMaskClose}>
             <Animated.View
               style={[styles.absolute, { opacity: this.state.opacity }]}
